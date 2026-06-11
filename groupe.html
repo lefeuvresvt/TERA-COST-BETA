@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TERRA COST — Groupe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700&family=Archivo+Black&display=swap');
+:root{
+  --bg:#15201B;--panel:#1E2D26;--edge:#2C4136;
+  --ink:#EDF5EF;--muted:#9FB5A8;--leaf:#5FC98E;--gold:#E8B84B;
+  --danger:#E06A5A;--purple:#9B8FD4;--r:14px;
+  --epoch-color:#5FC98E;
+}
+body[data-epoch="1"]{--epoch-color:#C4883A}
+body[data-epoch="2"]{--epoch-color:#4A9ECD}
+body[data-epoch="3"]{--epoch-color:#9B8FD4}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:14px;gap:12px;
+  font-size:15px;line-height:1.45}
+.wrap{width:100%;max-width:640px;display:flex;flex-direction:column;gap:12px}
+
+.screen{width:100%;max-width:540px;background:var(--panel);border:1px solid var(--edge);
+  border-radius:18px;padding:24px;display:flex;flex-direction:column;gap:14px;text-align:center}
+.screen h1{font-family:'Archivo Black';font-size:26px}
+.screen p{color:var(--muted);font-size:15px}
+.screen input{padding:14px;border-radius:10px;border:1.5px solid var(--edge);
+  background:var(--bg);color:var(--ink);font-size:18px;text-align:center;
+  font-family:'Archivo',sans-serif;width:100%}
+.screen input:focus{outline:2px solid var(--leaf)}
+.err{color:var(--danger);font-size:13px;min-height:15px}
+
+.role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.btn-role{padding:14px 8px;border-radius:12px;border:2px solid var(--edge);
+  background:var(--bg);color:var(--ink);font-family:'Archivo',sans-serif;
+  font-size:14px;cursor:pointer;line-height:1.5;transition:border-color .15s,opacity .2s}
+.btn-role:hover:not(:disabled){border-color:var(--leaf)}
+.btn-role:disabled{opacity:.3;cursor:not-allowed}
+.btn-role .ico{font-size:26px;display:block;margin-bottom:5px}
+.btn-role .cnt{font-size:11px;color:var(--muted);display:block;margin-top:6px}
+.btn-role.full .cnt{color:var(--danger)}
+
+.btn-main{width:100%;padding:16px;border-radius:var(--r);border:none;
+  font-family:'Archivo Black';font-size:17px;cursor:pointer}
+.btn-main.green{background:var(--leaf);color:#0E1A13}
+.btn-main.grey{background:#2C4136;color:#5C7466;cursor:not-allowed}
+
+.lobby-info{background:var(--bg);border:1px solid var(--edge);border-radius:var(--r);padding:14px;text-align:left}
+.lobby-info h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.player-chip{display:flex;align-items:center;gap:8px;font-size:15px;padding:4px 0}
+.player-chip .dot{width:8px;height:8px;border-radius:50%;background:var(--leaf);flex:none}
+.waiting-msg{font-family:'Archivo Black';font-size:17px;color:var(--muted);padding:14px}
+
+/* IDENTITÉ DE GROUPE — grande carte en haut du plateau */
+.identity{background:linear-gradient(135deg,var(--panel),#16231C);
+  border:2px solid var(--epoch-color);border-radius:16px;padding:14px 16px;
+  display:flex;align-items:center;gap:14px}
+.identity .big-ico{font-size:44px;flex:none}
+.identity .id-body{flex:1}
+.identity .id-name{font-family:'Archivo Black';font-size:20px}
+.identity .id-epoch{font-size:13px;color:var(--epoch-color);margin-top:2px}
+.identity .id-cash{text-align:right;flex:none}
+.identity .id-cash .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.identity .id-cash .val{font-family:'Archivo Black';font-size:28px;color:var(--gold)}
+.identity .id-tour{font-size:12px;color:var(--muted);margin-top:2px}
+
+.panel{background:var(--panel);border:1px solid var(--edge);border-radius:var(--r);padding:14px}
+.panel h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline}
+.panel h3 b{color:var(--leaf);font-family:'Archivo Black';font-size:15px;letter-spacing:0}
+
+/* ressources avec descriptions */
+.res-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.res-row:last-child{margin-bottom:0}
+.res-ico{font-size:20px;width:26px;text-align:center;flex:none}
+.res-mid{flex:1}
+.res-name{font-size:13px;font-family:'Archivo Black';margin-bottom:3px}
+.res-desc{font-size:11px;color:var(--muted);line-height:1.35;margin-bottom:4px}
+.res-bg{height:10px;background:#1a2e23;border-radius:5px;overflow:hidden}
+.res-fill{height:100%;border-radius:5px}
+.fill-w{background:#4A9ECD}.fill-c{background:#8A8A9A}
+.fill-o{background:#C4883A}.fill-b{background:var(--leaf)}
+.res-val{font-family:'Archivo Black';font-size:15px;width:52px;text-align:right;flex:none}
+
+.forest{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+.tree{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  font-size:clamp(14px,4vw,22px);background:#24382E;border:1px solid #36513F}
+.tree.gone{opacity:.1;transform:scale(.6);filter:grayscale(1)}
+
+.gauge{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:6px}
+.gcell{aspect-ratio:1;border-radius:5px;border:1.5px dashed #41584C}
+.gcell.filled{background:#0A0D0B;border-color:#000}
+.gauge-note{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic}
+
+/* objectif + suivi fusionnés et lisibles */
+.objective{background:#1E1A2E;border:2px solid #4A3F73;border-radius:var(--r);padding:14px}
+.objective h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--purple);
+  margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.objective .goal-text{font-size:14px;line-height:1.5;margin-bottom:12px;color:var(--ink)}
+.obj-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.obj-row:last-child{margin-bottom:0}
+.obj-ico{font-size:18px;width:24px;text-align:center;flex:none}
+.obj-label{flex:1;font-size:13px;color:var(--muted);line-height:1.35}
+.obj-num{font-family:'Archivo Black';font-size:15px;flex:none;min-width:54px;text-align:right}
+.obj-bar-bg{width:64px;height:8px;background:#2A1E3A;border-radius:4px;overflow:hidden;flex:none}
+.obj-bar{height:100%;border-radius:4px}
+.obj-bar.ok{background:var(--leaf)}.obj-bar.warn{background:var(--gold)}.obj-bar.bad{background:var(--danger)}
+.obj-verdict{margin-top:12px;text-align:center;font-size:13px;padding:8px;border-radius:8px;font-family:'Archivo Black'}
+.obj-verdict.ok{background:#1E4A30;color:var(--leaf)}
+.obj-verdict.bad{background:#2A1A18;color:var(--danger)}
+
+.actions{display:flex;flex-direction:column;gap:10px}
+.actions-title{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:-2px;padding-left:2px}
+.action{display:flex;flex-direction:column;gap:6px;width:100%;
+  background:var(--panel);border:2px solid var(--edge);border-radius:var(--r);
+  padding:13px 14px;color:var(--ink);text-align:left;cursor:pointer;
+  transition:border-color .15s,background .15s;font-family:'Archivo',sans-serif}
+.action .top{display:flex;align-items:center;gap:12px}
+.action .ico{font-size:26px;width:34px;text-align:center;flex:none}
+.action .name{font-family:'Archivo Black';font-size:16px;flex:1}
+.action .euro{font-family:'Archivo Black';font-size:20px;color:var(--gold);flex:none}
+.action .fx{font-size:12.5px;color:var(--muted);line-height:1.5}
+.action.sel{border-color:var(--leaf);background:#1E3428}
+.action:disabled{opacity:.3;cursor:not-allowed}
+
+.event-banner{border-radius:var(--r);padding:14px;text-align:center}
+.event-banner.good{background:#1E3D14;border:2px solid var(--leaf)}
+.event-banner.bad{background:#3A1A18;border:2px solid var(--danger)}
+.event-banner b{font-family:'Archivo Black';font-size:15px;display:block;margin-bottom:4px}
+.event-banner span{font-size:13px;line-height:1.5}
+
+.overlay{position:fixed;inset:0;background:rgba(8,12,10,.94);
+  display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal{background:var(--panel);border:1px solid var(--edge);border-radius:18px;
+  padding:24px;max-width:440px;width:100%;text-align:center;display:flex;flex-direction:column;gap:13px}
+.modal h2{font-family:'Archivo Black';font-size:21px}
+.modal p{color:var(--muted);font-size:14px;line-height:1.5}
+.chips{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.chip{font-size:21px}
+
+.epoch-overlay{position:fixed;inset:0;background:rgba(8,12,10,.97);
+  display:flex;align-items:center;justify-content:center;padding:16px;z-index:30}
+.epoch-card{background:linear-gradient(160deg,#1A2E20,#0E1A13);
+  border:2px solid var(--epoch-color);border-radius:18px;padding:24px;max-width:500px;width:100%;
+  display:flex;flex-direction:column;gap:12px;text-align:center}
+.epoch-card .era{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--epoch-color)}
+.epoch-card h2{font-family:'Archivo Black';font-size:24px}
+.epoch-card .pop{font-size:14px;color:var(--gold)}
+.epoch-card .desc{font-size:14px;line-height:1.6;color:#C5DDD0}
+.epoch-card .nouveautes{background:rgba(0,0,0,.25);border-radius:10px;padding:12px;
+  font-size:13px;text-align:left;line-height:1.6;color:var(--ink)}
+
+.audit-line{display:flex;justify-content:space-between;padding:9px 0;
+  border-bottom:1px dashed var(--edge);font-size:15px;gap:8px;text-align:left}
+.audit-line.total{border:none;font-family:'Archivo Black';font-size:23px;padding-top:13px}
+.pos{color:var(--gold)}.neg{color:var(--danger)}.bon{color:var(--purple)}
+
+.hidden{display:none!important}
+footer{font-size:11px;color:#3A5045;padding-bottom:4px}
+</style>
+</head>
+<body data-epoch="0">
+
+<!-- ① ACCUEIL -->
+<div class="screen" id="scr-home">
+  <h1>TERRA COST</h1>
+  <p>Entrez le code donné par votre professeur.</p>
+  <input id="inp-session" type="text" maxlength="8" placeholder="Code de la partie"
+    autocomplete="off" style="text-transform:uppercase" oninput="onSessionInput()">
+  <div class="err" id="err-home"></div>
+  <p>Puis choisissez le rôle de votre groupe.<br>
+  <span style="font-size:12px">Chaque rôle peut être pris par deux groupes au maximum.</span></p>
+  <div class="role-grid">
+    <button class="btn-role" id="rb0" onclick="pickRole(0)" disabled>
+      <span class="ico">🏭</span>L'Industriel<span class="cnt" id="rc0">0 / 2 groupes</span></button>
+    <button class="btn-role" id="rb1" onclick="pickRole(1)" disabled>
+      <span class="ico">🌾</span>L'Agriculteur<span class="cnt" id="rc1">0 / 2 groupes</span></button>
+    <button class="btn-role" id="rb2" onclick="pickRole(2)" disabled>
+      <span class="ico">🏛️</span>L'État<span class="cnt" id="rc2">0 / 2 groupes</span></button>
+    <button class="btn-role" id="rb3" onclick="pickRole(3)" disabled>
+      <span class="ico">🌿</span>L'Association écologiste<span class="cnt" id="rc3">0 / 2 groupes</span></button>
+    <button class="btn-role" id="rb4" onclick="pickRole(4)" disabled>
+      <span class="ico">🔬</span>Le Chercheur<span class="cnt" id="rc4">0 / 2 groupes</span></button>
+    <button class="btn-role" id="rb5" onclick="pickRole(5)" disabled>
+      <span class="ico">🏘️</span>Les Habitants<span class="cnt" id="rc5">0 / 2 groupes</span></button>
+  </div>
+  <div class="err" id="err-role"></div>
+</div>
+
+<!-- ② LOBBY -->
+<div class="screen hidden" id="scr-lobby">
+  <h1 id="lobby-ico" style="font-size:46px"></h1>
+  <h1 id="lobby-name"></h1>
+  <p id="lobby-goal" style="color:var(--ink);font-size:15px"></p>
+  <p style="font-size:13px;font-style:italic">🤫 Cet objectif est secret : ne le montrez pas aux autres groupes.</p>
+  <div class="lobby-info">
+    <h3>Groupes connectés</h3>
+    <div id="player-list"></div>
+  </div>
+  <div class="waiting-msg">⏳ Attendez que le professeur lance la partie…</div>
+</div>
+
+<!-- ③ TRANSITION ÉPOQUE -->
+<div class="epoch-overlay hidden" id="scr-epoch">
+  <div class="epoch-card">
+    <div class="era" id="ep-era"></div>
+    <h2 id="ep-title"></h2>
+    <div class="pop" id="ep-pop"></div>
+    <div class="desc" id="ep-desc"></div>
+    <div class="nouveautes" id="ep-new"></div>
+    <button class="btn-main green" onclick="confirmEpoch()">J'ai compris, on continue</button>
+  </div>
+</div>
+
+<!-- ④ ATTENTE -->
+<div class="overlay hidden" id="scr-wait">
+  <div class="modal">
+    <h2>✅ Choix enregistré</h2>
+    <p>On attend que les autres groupes terminent leur tour.</p>
+    <div class="chips" id="wait-chips"></div>
+  </div>
+</div>
+
+<!-- ⑤ FIN DE PARTIE -->
+<div class="overlay hidden" id="scr-finished">
+  <div class="modal">
+    <h2>🏁 Fin des 4 époques</h2>
+    <p>La partie est terminée.<br>L'expert-comptable prépare l'audit final…</p>
+    <p style="font-size:13px">Regardez l'écran du professeur.</p>
+  </div>
+</div>
+
+<!-- ⑥ AUDIT -->
+<div class="overlay hidden" id="scr-audit">
+  <div class="modal" style="max-width:500px">
+    <h2>AUDIT FINAL</h2>
+    <div>
+      <div class="audit-line"><span>Argent gagné pendant la partie</span><b class="pos" id="au-brut"></b></div>
+      <div class="audit-line"><span id="au-emp-lbl"></span><b class="neg" id="au-emp"></b></div>
+      <div class="audit-line hidden" id="au-geo-row"><span>Dégâts cachés de la géo-ingénierie</span><b class="neg" id="au-geo"></b></div>
+      <div class="audit-line hidden" id="au-bonus-row"><span>🎯 Objectif secret réussi</span><b class="bon">+15 €</b></div>
+      <div class="audit-line total"><span>ARGENT RÉEL</span><b id="au-net"></b></div>
+    </div>
+    <p id="au-verdict" style="font-size:15px"></p>
+    <p style="font-size:13px;color:var(--danger)" id="au-miss"></p>
+  </div>
+</div>
+
+<!-- ⑦ PLATEAU -->
+<div class="wrap hidden" id="scr-plateau">
+
+  <div class="identity">
+    <span class="big-ico" id="id-ico">🏭</span>
+    <div class="id-body">
+      <div class="id-name" id="id-name">L'Industriel</div>
+      <div class="id-epoch" id="id-epoch">Époque 1 · Le monde préindustriel</div>
+    </div>
+    <div class="id-cash">
+      <div class="lbl">Votre argent</div>
+      <div class="val" id="id-cash">0 €</div>
+      <div class="id-tour" id="id-tour">Année 1 sur 6</div>
+    </div>
+  </div>
+
+  <div id="event-box" class="hidden"></div>
+
+  <div class="panel">
+    <h3>Ressources partagées par tous les groupes</h3>
+    <div class="res-row"><span class="res-ico">💧</span>
+      <div class="res-mid">
+        <div class="res-name">Eau douce</div>
+        <div class="res-desc">Utilisée par l'agriculture et l'industrie. Elle se régénère un peu chaque année grâce à la pluie.</div>
+        <div class="res-bg"><div class="res-fill fill-w" id="fw" style="width:100%"></div></div>
+      </div>
+      <span class="res-val" id="vw">300</span></div>
+    <div class="res-row hidden" id="rr-coal"><span class="res-ico">🪨</span>
+      <div class="res-mid">
+        <div class="res-name">Charbon</div>
+        <div class="res-desc">Énergie fossile : une fois consommé, il ne revient jamais. Stock partagé entre tous les groupes.</div>
+        <div class="res-bg"><div class="res-fill fill-c" id="fc" style="width:100%"></div></div>
+      </div>
+      <span class="res-val" id="vc">200</span></div>
+    <div class="res-row hidden" id="rr-oil"><span class="res-ico">🛢️</span>
+      <div class="res-mid">
+        <div class="res-name">Pétrole</div>
+        <div class="res-desc">Énergie fossile très rentable, mais non renouvelable et très polluante.</div>
+        <div class="res-bg"><div class="res-fill fill-o" id="fo" style="width:100%"></div></div>
+      </div>
+      <span class="res-val" id="vo">150</span></div>
+    <div class="res-row"><span class="res-ico">🌿</span>
+      <div class="res-mid">
+        <div class="res-name">Biodiversité mondiale</div>
+        <div class="res-desc">La santé des écosystèmes de la planète. Elle baisse avec l'exploitation et remonte avec la préservation.</div>
+        <div class="res-bg"><div class="res-fill fill-b" id="fb" style="width:100%"></div></div>
+      </div>
+      <span class="res-val" id="vb">100%</span></div>
+  </div>
+
+  <div class="panel">
+    <h3>Votre forêt locale <b id="forest-count">12 arbres</b></h3>
+    <div class="forest" id="forest-grid"></div>
+  </div>
+
+  <div class="panel">
+    <h3>Votre empreinte carbone</h3>
+    <div class="gauge" id="gauge-grid"></div>
+    <div class="gauge-note">Chaque case noircie représente de la pollution accumulée. Sa valeur en euros sera révélée à l'audit final.</div>
+  </div>
+
+  <div class="objective">
+    <h3><span>🎯 Votre objectif secret</span>
+      <span id="secret-eye" onclick="toggleSecret()" style="cursor:pointer;font-size:17px">👁️</span></h3>
+    <div class="goal-text hidden" id="goal-text"></div>
+    <div id="obj-rows"></div>
+    <div class="obj-verdict" id="obj-verdict"></div>
+  </div>
+
+  <div class="actions-title">Choisissez UNE action pour cette année :</div>
+  <div class="actions" id="actions-box"></div>
+  <button class="btn-main grey" id="btn-val" onclick="submitChoice()" disabled>Choisissez une action ci-dessus</button>
+
+  <footer>TERRA COST — version bêta — SVT 3e</footer>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const CFG={
+  apiKey:"AIzaSyCKKcYvlsBxJhKsS02CkEhRHMcvvOWvsdk",
+  authDomain:"tera-cost-svt.firebaseapp.com",
+  databaseURL:"https://tera-cost-svt-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"tera-cost-svt",
+  storageBucket:"tera-cost-svt.firebasestorage.app",
+  messagingSenderId:"842230494161",
+  appId:"1:842230494161:web:ced9dae0bc2faca7bbe6f0"
+};
+
+const ROLES=[
+  {ico:"🏭",name:"L'Industriel",
+   goal:"Terminer la partie avec au moins 60 € : votre but est le profit maximum.",
+   check:(s)=>s.cash>=60},
+  {ico:"🌾",name:"L'Agriculteur",
+   goal:"Terminer la partie avec une forêt locale d'au moins 8 arbres : vous vivez de votre terre.",
+   check:(s)=>s.forest>=8},
+  {ico:"🏛️",name:"L'État",
+   goal:"Terminer la partie avec un Indice de viabilité planétaire d'au moins 50 : vous gouvernez pour l'avenir.",
+   check:(s)=>s.ivp>=50},
+  {ico:"🌿",name:"L'Association écologiste",
+   goal:"Terminer la partie avec une biodiversité mondiale d'au moins 40 % : vous protégez le vivant.",
+   check:(s)=>s.bio>=40},
+  {ico:"🔬",name:"Le Chercheur",
+   goal:"Jouer l'action « énergie renouvelable » au moins 3 fois : vous croyez en la science.",
+   check:(s)=>s.renewCount>=3},
+  {ico:"🏘️",name:"Les Habitants",
+   goal:"Terminer la partie avec un stock d'eau d'au moins 120 : sans eau, pas de vie quotidienne.",
+   check:(s)=>s.water>=120},
+];
+
+const EPOCHS=[
+  {era:"Époque 1 · vers 1750",title:"Le monde préindustriel",pop:"Population mondiale : 700 millions",
+   desc:"Vos outils : la hache et la charrue. Les ressources semblent infinies.",
+   news:"✦ 3 actions disponibles\n✦ Ressources : votre forêt, l'eau partagée, la biodiversité"},
+  {era:"Époque 2 · 1800 à 1900",title:"La révolution industrielle",pop:"Population mondiale : 1 à 1,6 milliard",
+   desc:"Le charbon alimente les machines. Les profits explosent. Le ciel noircit.",
+   news:"✦ NOUVEAU : le charbon est disponible (stock partagé, non renouvelable)\n✦ NOUVELLE ACTION : Industrialisation (très rentable, très polluante)\n✦ Bonus de croissance : +2 € par an pour tous"},
+  {era:"Époque 3 · 1900 à 2025",title:"Le monde moderne",pop:"Population mondiale : 1,6 à 8 milliards",
+   desc:"Le pétrole fait tourner la planète. Les scientifiques s'inquiètent.",
+   news:"✦ NOUVEAU : le pétrole est disponible (très rentable, très polluant)\n✦ NOUVELLE ACTION : Investir dans l'énergie renouvelable (coûte maintenant, rapporte ensuite)\n✦ La biodiversité devient fragile"},
+  {era:"Époque 4 · 2025 à 2100",title:"Le monde futur",pop:"Population mondiale : 8 à 10 milliards",
+   desc:"Les ressources fossiles s'épuisent. Le monde que vous jouez maintenant, c'est celui que vous allez habiter.",
+   news:"✦ NOUVELLE ACTION : Accord international (ne marche que si 4 groupes ou plus le choisissent ensemble)\n✦ NOUVELLE ACTION : Géo-ingénierie (semble parfaite… vraiment ?)\n✦ L'Indice de viabilité planétaire devient décisif"},
+];
+
+// Actions : textes complets, sans abréviations
+const ACTIONS=[
+  [ // Époque 1
+   {ico:"🌾",name:"Agriculture",            euro:"+4 €",
+    fx:"Consomme 2 unités d'eau partagée. La biodiversité baisse un peu. Votre empreinte carbone : +1 case.",
+    f:0,e:1},
+   {ico:"🪓",name:"Couper la forêt",         euro:"+7 €",
+    fx:"Votre forêt perd 2 arbres. La biodiversité baisse un peu. Votre empreinte carbone : +2 cases.",
+    f:-2,e:2},
+   {ico:"🌱",name:"Préserver et replanter",  euro:"+2 €",
+    fx:"Votre forêt gagne 1 arbre. L'eau et la biodiversité remontent un peu. Aucune pollution.",
+    f:1,e:0}],
+  [ // Époque 2
+   {ico:"🌾",name:"Agriculture intensive",   euro:"+5 €",
+    fx:"Consomme 3 unités d'eau partagée. Votre empreinte carbone : +1 case.",
+    f:0,e:1},
+   {ico:"🪓",name:"Couper la forêt",          euro:"+8 €",
+    fx:"Votre forêt perd 2 arbres. La biodiversité baisse. Votre empreinte carbone : +2 cases.",
+    f:-2,e:2},
+   {ico:"🏭",name:"Industrialisation",        euro:"+15 €",
+    fx:"Consomme 5 unités de charbon partagé et 2 unités d'eau. Très polluant : empreinte +5 cases.",
+    f:0,e:5},
+   {ico:"🌱",name:"Préserver et replanter",   euro:"+2 €",
+    fx:"Votre forêt gagne 1 arbre. L'eau et la biodiversité remontent. Aucune pollution.",
+    f:1,e:0}],
+  [ // Époque 3
+   {ico:"🌾",name:"Agro-industrie",           euro:"+6 €",
+    fx:"Consomme 2 unités d'eau. La biodiversité baisse nettement. Votre forêt perd 1 arbre. Empreinte +2 cases.",
+    f:-1,e:2},
+   {ico:"🏭",name:"Industrie lourde",          euro:"+12 €",
+    fx:"Consomme 3 unités de charbon et 2 unités d'eau. Empreinte +4 cases.",
+    f:0,e:4},
+   {ico:"🛢️",name:"Exploitation du pétrole",  euro:"+18 €",
+    fx:"Consomme 6 unités de pétrole partagé. La biodiversité chute fortement. Empreinte +6 cases.",
+    f:0,e:6},
+   {ico:"☀️",name:"Investir dans le renouvelable",euro:"−5 € puis +4 €/an",
+    fx:"Vous payez 5 € maintenant, mais vous gagnerez 4 € automatiquement chaque année suivante. Empreinte −1 case.",
+    f:0,e:-1,renew:true},
+   {ico:"🌱",name:"Préserver et replanter",    euro:"+3 €",
+    fx:"Votre forêt gagne 1 arbre. L'eau et la biodiversité remontent. Aucune pollution.",
+    f:1,e:0}],
+  [ // Époque 4
+   {ico:"🛢️",name:"Brûler les dernières réserves",euro:"+20 €",
+    fx:"Consomme 8 unités de pétrole. L'Indice de viabilité planétaire chute de 3 points. Empreinte +8 cases.",
+    f:0,e:8,needOil:true},
+   {ico:"☀️",name:"Transition énergétique",    euro:"+6 €",
+    fx:"Énergie propre et rentable. L'Indice de viabilité remonte d'1 point. Empreinte −1 case.",
+    f:0,e:-1,renew:true},
+   {ico:"🌿",name:"Restaurer les écosystèmes", euro:"+1 €",
+    fx:"La biodiversité remonte fortement. L'Indice de viabilité gagne 2 points. Votre forêt gagne 2 arbres.",
+    f:2,e:-1},
+   {ico:"🤝",name:"Accord international",      euro:"+4 € si réussi",
+    fx:"Ne fonctionne que si 4 groupes ou plus le choisissent EN MÊME TEMPS. Si réussi : +4 € chacun et l'Indice de viabilité gagne 5 points. Sinon : +2 € de consolation.",
+    f:0,e:0,isAccord:true},
+   {ico:"⚡",name:"Géo-ingénierie",             euro:"+10 €",
+    fx:"Technologie qui refroidit le climat artificiellement : l'Indice de viabilité gagne 3 points. Aucun inconvénient visible… pour l'instant.",
+    f:0,e:0,isGeo:true}],
+];
+
+// ── État ─────────────────────────────────────────────────────────────────
+const UID=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+let DB=null,SESSION=null,MY_ROLE=null;
+let S={cash:0,forest:12,empr:0,epochIdx:0,tourInEpoch:1,
+  renewCount:0,geoCount:0,selected:null,locked:false,secretOpen:false};
+let _lastChoice=null,_inLobby=true;
+const MAX_F=20,MAX_E=24;
+const $=id=>document.getElementById(id);
+
+// cache anti-scintillement : on ne touche au DOM que si la valeur change
+const _cache={};
+function setIf(id,prop,val){
+  const key=id+":"+prop;
+  if(_cache[key]===val) return;
+  _cache[key]=val;
+  const el=$(id); if(!el) return;
+  if(prop==="text") el.textContent=val;
+  else if(prop==="width") el.style.width=val;
+  else if(prop==="html") el.innerHTML=val;
+}
+
+// ── Accueil ──────────────────────────────────────────────────────────────
+function onSessionInput(){
+  const s=$("inp-session").value.trim().toUpperCase();
+  if(s.length<3) return;
+  if(s===SESSION) return;
+  SESSION=s;
+  if(!DB) DB=getDatabase(initializeApp(CFG,"tc"));
+  onValue(ref(DB,`s/${SESSION}/lobby`),snap=>updateRoleUI(snap.val()||{}));
+}
+
+function updateRoleUI(lobby){
+  const counts=[0,0,0,0,0,0];
+  Object.values(lobby).forEach(p=>{if(p?.ri!==undefined)counts[p.ri]++;});
+  const total=Object.keys(lobby).length;
+  for(let i=0;i<6;i++){
+    const full=counts[i]>=2||total>=12;
+    $("rb"+i).disabled=full;
+    $("rb"+i).classList.toggle("full",counts[i]>=2);
+    $("rc"+i).textContent=counts[i]+" / 2 groupes";
+  }
+}
+
+function pickRole(ri){
+  const s=$("inp-session").value.trim().toUpperCase();
+  if(s.length<3){$("err-home").textContent="Entrez d'abord le code de la partie.";return;}
+  SESSION=s;MY_ROLE=ri;
+  if(!DB) DB=getDatabase(initializeApp(CFG,"tc"));
+  set(ref(DB,`s/${SESSION}/lobby/${UID}`),{ri,name:ROLES[ri].name,ico:ROLES[ri].ico})
+    .then(()=>{showLobby();listenLobby();listenGame();})
+    .catch(e=>{$("err-role").textContent="Erreur de connexion : "+e.message;});
+}
+
+// ── Lobby ────────────────────────────────────────────────────────────────
+function showLobby(){
+  const r=ROLES[MY_ROLE];
+  $("lobby-ico").textContent=r.ico;
+  $("lobby-name").textContent=r.name;
+  $("lobby-goal").textContent=r.goal;
+  $("goal-text").textContent=r.goal;
+  $("scr-home").classList.add("hidden");
+  $("scr-lobby").classList.remove("hidden");
+}
+
+function listenLobby(){
+  onValue(ref(DB,`s/${SESSION}/lobby`),snap=>{
+    const lobby=snap.val()||{};
+    const list=$("player-list");list.innerHTML="";
+    Object.values(lobby).forEach(p=>{
+      if(!p)return;
+      const d=document.createElement("div");
+      d.className="player-chip";
+      d.innerHTML=`<span class="dot"></span><span>${p.ico} ${p.name}</span>`;
+      list.appendChild(d);
+    });
+  });
+}
+
+// ── Jeu ──────────────────────────────────────────────────────────────────
+function listenGame(){
+  onValue(ref(DB,`s/${SESSION}/game`),snap=>{
+    const g=snap.val();if(!g)return;
+
+    if(_inLobby&&g.phase==="playing"){
+      _inLobby=false;
+      $("scr-lobby").classList.add("hidden");
+      buildBoard();
+      showEpochCard(0,()=>{
+        $("scr-plateau").classList.remove("hidden");
+        handleGame(g);
+      });
+      return;
+    }
+    if(_inLobby)return;
+
+    if(g.phase==="playing") handleGame(g);
+    else if(g.phase==="finished"){ $("scr-wait").classList.add("hidden");$("scr-finished").classList.remove("hidden"); }
+    else if(g.phase==="audit"){ $("scr-finished").classList.add("hidden");showAudit(g); }
+  });
+}
+
+function handleGame(g){
+  const shared=g.shared||{water:300,coal:200,oil:150,bio:100,ivp:80};
+
+  // cagnotte = source unique : le serveur
+  S.cash=g.cagnottes?.[UID]??0;
+  S.renewCount=g.renew?.[UID]??0;
+  S.geoCount=g.geo?.[UID]??0;
+
+  // changement d'époque
+  if(g.epochIdx!==undefined&&g.epochIdx!==S.epochIdx){
+    const ne=g.epochIdx;
+    _lastChoice=null;
+    document.body.dataset.epoch=ne;
+    showEpochCard(ne,()=>{
+      S.epochIdx=ne;S.tourInEpoch=g.tourInEpoch||1;
+      S.locked=false;S.selected=null;
+      $("scr-wait").classList.add("hidden");
+      renderBoard(g,shared);
+    });
+    return;
+  }
+  S.epochIdx=g.epochIdx??0;
+  S.tourInEpoch=g.tourInEpoch??1;
+
+  const myChoice=g.choices?.[UID];
+  const empty=!g.choices||Object.keys(g.choices).length===0;
+
+  if(_lastChoice!==null&&empty){
+    // le tour vient d'être validé → appliquer effets LOCAUX (forêt, empreinte)
+    const a=ACTIONS[S.epochIdx][_lastChoice];
+    if(a){
+      S.forest=Math.max(0,Math.min(MAX_F,S.forest+(a.f||0)));
+      S.empr=Math.max(0,Math.min(MAX_E,S.empr+(a.e||0)));
+    }
+    _lastChoice=null;
+    S.locked=false;S.selected=null;
+    $("scr-wait").classList.add("hidden");
+  }
+  if(myChoice!==undefined&&myChoice!==null) _lastChoice=myChoice;
+
+  renderBoard(g,shared);
+  if(_lastChoice!==null&&!empty) showWait(g);
+}
+
+// ── Rendu ─────────────────────────────────────────────────────────────────
+function buildBoard(){
+  const fg=$("forest-grid");fg.innerHTML="";
+  for(let i=0;i<MAX_F;i++){const d=document.createElement("div");
+    d.className="tree";d.textContent="🌳";d.id="tr"+i;fg.appendChild(d);}
+  const gg=$("gauge-grid");gg.innerHTML="";
+  for(let i=0;i<MAX_E;i++){const c=document.createElement("div");
+    c.className="gcell";c.id="gc"+i;gg.appendChild(c);}
+}
+
+function renderBoard(g,shared){
+  const ep=EPOCHS[S.epochIdx];
+  const r=ROLES[MY_ROLE];
+  setIf("id-ico","text",r.ico);
+  setIf("id-name","text",r.name);
+  setIf("id-epoch","text",ep.era+" · "+ep.title);
+  setIf("id-cash","text",S.cash+" €");
+  setIf("id-tour","text","Année "+S.tourInEpoch+" sur 6");
+  setIf("forest-count","text",S.forest+(S.forest>1?" arbres":" arbre"));
+
+  for(let i=0;i<MAX_F;i++){
+    const gone=i>=S.forest;
+    const key="tr"+i+":gone";
+    if(_cache[key]!==gone){_cache[key]=gone;$("tr"+i).classList.toggle("gone",gone);}
+  }
+  for(let i=0;i<MAX_E;i++){
+    const fill=i<S.empr;
+    const key="gc"+i+":fill";
+    if(_cache[key]!==fill){_cache[key]=fill;$("gc"+i).classList.toggle("filled",fill);}
+  }
+
+  const w=shared.water??300,c=shared.coal??200,o=shared.oil??150,b=shared.bio??100;
+  setIf("fw","width",Math.max(0,w/300*100)+"%");setIf("vw","text",Math.round(w));
+  setIf("fc","width",Math.max(0,c/200*100)+"%");setIf("vc","text",Math.round(c));
+  setIf("fo","width",Math.max(0,o/150*100)+"%");setIf("vo","text",Math.round(o));
+  setIf("fb","width",Math.max(0,b)+"%");setIf("vb","text",Math.round(b)+" %");
+  $("rr-coal").classList.toggle("hidden",S.epochIdx<1);
+  $("rr-oil").classList.toggle("hidden",S.epochIdx<2);
+
+  // événement
+  const ev=g.event,eb=$("event-box");
+  const evKey=ev?ev.title+ev.text:"";
+  if(_cache["evt"]!==evKey){
+    _cache["evt"]=evKey;
+    if(ev){eb.className="event-banner "+(ev.type||"good");
+      eb.innerHTML=`<b>${ev.title}</b><span>${ev.text}</span>`;eb.classList.remove("hidden");}
+    else eb.classList.add("hidden");
+  }
+
+  renderObjective(shared);
+  renderActions(shared);
+}
+
+function renderObjective(shared){
+  if(MY_ROLE===null)return;
+  const ivp=shared?.ivp??80;
+  const checkState={cash:S.cash,forest:S.forest,ivp,
+    bio:shared?.bio??100,water:shared?.water??300,renewCount:S.renewCount};
+
+  const IND={
+    0:[{ico:"💰",label:"Votre argent (objectif : 60 € à la fin)",val:S.cash+" €",pct:Math.min(100,S.cash/60*100),warn:false}],
+    1:[{ico:"🌲",label:"Votre forêt (objectif : 8 arbres minimum à la fin)",val:S.forest,pct:Math.min(100,S.forest/8*100),warn:S.forest<8}],
+    2:[{ico:"🌍",label:"Indice de viabilité planétaire (objectif : 50 minimum)",val:Math.round(ivp),pct:ivp,warn:ivp<50}],
+    3:[{ico:"🌿",label:"Biodiversité mondiale (objectif : 40 % minimum à la fin)",val:Math.round(shared?.bio??100)+" %",pct:shared?.bio??100,warn:(shared?.bio??100)<40}],
+    4:[{ico:"☀️",label:"Énergie renouvelable jouée (objectif : 3 fois)",val:S.renewCount+" / 3",pct:Math.min(100,S.renewCount/3*100),warn:false}],
+    5:[{ico:"💧",label:"Stock d'eau partagé (objectif : 120 minimum à la fin)",val:Math.round(shared?.water??300),pct:Math.min(100,(shared?.water??300)/300*100),warn:(shared?.water??300)<120}],
+  };
+
+  const inds=IND[MY_ROLE]||[];
+  const html=inds.map(ind=>{
+    const bar=ind.warn?"bad":ind.pct>=100?"ok":"warn";
+    return `<div class="obj-row">
+      <span class="obj-ico">${ind.ico}</span>
+      <span class="obj-label">${ind.label}</span>
+      <div class="obj-bar-bg"><div class="obj-bar ${bar}" style="width:${Math.min(100,ind.pct)}%"></div></div>
+      <span class="obj-num" style="color:${ind.warn?'var(--danger)':'var(--ink)'}">${ind.val}</span>
+    </div>`;
+  }).join("");
+  setIf("obj-rows","html",html);
+
+  const ok=ROLES[MY_ROLE].check(checkState);
+  const vd=$("obj-verdict");
+  const vKey=ok?"ok":"bad";
+  if(_cache["verdict"]!==vKey){
+    _cache["verdict"]=vKey;
+    vd.className="obj-verdict "+vKey;
+    vd.textContent=ok?"✅ Objectif en bonne voie — continuez comme ça !":"⚠️ Objectif en danger — adaptez votre stratégie !";
+  }
+}
+
+function renderActions(shared){
+  const acts=ACTIONS[S.epochIdx];
+  const stateKey=S.epochIdx+":"+S.selected+":"+S.locked+":"+Math.round(shared?.oil??150);
+  if(_cache["actions"]===stateKey)return;
+  _cache["actions"]=stateKey;
+
+  const box=$("actions-box");box.innerHTML="";
+  acts.forEach((a,i)=>{
+    const noOil=a.needOil&&(shared?.oil??150)<=0;
+    const btn=document.createElement("button");
+    btn.className="action"+(S.selected===i&&!S.locked?" sel":"");
+    btn.disabled=noOil||S.locked;
+    btn.innerHTML=`<div class="top">
+      <span class="ico">${a.ico}</span>
+      <span class="name">${a.name}</span>
+      <span class="euro">${a.euro}</span></div>
+      <div class="fx">${noOil?"⛔ Plus de pétrole disponible — cette action est impossible.":a.fx}</div>`;
+    btn.onclick=()=>{if(!S.locked){S.selected=(S.selected===i)?null:i;
+      _cache["actions"]=null;renderActions(shared);}};
+    box.appendChild(btn);
+  });
+  const ok=S.selected!==null&&!S.locked;
+  $("btn-val").disabled=!ok;
+  $("btn-val").className="btn-main "+(ok?"green":"grey");
+  $("btn-val").textContent=ok?"✅ Valider mon choix de l'année":"Choisissez une action ci-dessus";
+}
+
+function submitChoice(){
+  if(S.selected===null||S.locked)return;
+  S.locked=true;
+  _cache["actions"]=null;
+  update(ref(DB,`s/${SESSION}/game/choices`),{[UID]:S.selected}).catch(e=>console.error(e));
+}
+
+function showWait(g){
+  $("scr-wait").classList.remove("hidden");
+  const lobby=g.lobbySnapshot||{};
+  const html=Object.entries(lobby).map(([uid,p])=>{
+    if(!p)return"";
+    const done=g.choices?.[uid]!==undefined&&g.choices?.[uid]!==null;
+    return `<span class="chip">${done?"✅":"⏳"}${p.ico}</span>`;
+  }).join("");
+  setIf("wait-chips","html",html);
+}
+
+function showEpochCard(idx,cb){
+  const ep=EPOCHS[idx];
+  $("ep-era").textContent=ep.era;
+  $("ep-title").textContent=ep.title;
+  $("ep-pop").textContent=ep.pop;
+  $("ep-desc").textContent=ep.desc;
+  $("ep-new").innerHTML=ep.news.replaceAll("\n","<br>");
+  document.body.dataset.epoch=idx;
+  $("scr-epoch").classList.remove("hidden");
+  window._cb=cb;
+}
+function confirmEpoch(){
+  $("scr-epoch").classList.add("hidden");
+  if(window._cb){window._cb();window._cb=null;}
+}
+
+function showAudit(g){
+  $("scr-plateau").classList.add("hidden");
+  $("scr-wait").classList.add("hidden");
+  const shared=g.shared||{};
+  S.cash=g.cagnottes?.[UID]??S.cash;
+  const empC=S.empr*4;
+  const geoC=S.geoCount*8;
+  const checkState={cash:S.cash,forest:S.forest,ivp:shared.ivp??80,
+    bio:shared.bio??100,water:shared.water??300,renewCount:S.renewCount};
+  const ok=ROLES[MY_ROLE].check(checkState);
+  const bonus=ok?15:0;
+  const net=S.cash-empC-geoC+bonus;
+
+  $("au-brut").textContent="+"+S.cash+" €";
+  $("au-emp-lbl").textContent="Votre pollution : "+S.empr+" case"+(S.empr>1?"s":"")+" noircie"+(S.empr>1?"s":"")+" × 4 €";
+  $("au-emp").textContent="−"+empC+" €";
+  $("au-geo-row").classList.toggle("hidden",geoC===0);
+  if(geoC>0)$("au-geo").textContent="−"+geoC+" €";
+  $("au-bonus-row").classList.toggle("hidden",!ok);
+  $("au-net").textContent=(net>=0?"+":"")+net+" €";
+  $("au-net").className=net>=0?"pos":"neg";
+  $("au-verdict").textContent=net>=0
+    ?"Votre groupe survit à l'audit environnemental."
+    :"Faillite : les coûts cachés de la pollution dépassent tout ce que vous avez gagné.";
+  $("au-miss").textContent=ok?"":"❌ Objectif secret manqué : "+ROLES[MY_ROLE].goal;
+  $("scr-audit").classList.remove("hidden");
+}
+
+function toggleSecret(){
+  S.secretOpen=!S.secretOpen;
+  $("goal-text").classList.toggle("hidden",!S.secretOpen);
+  $("secret-eye").textContent=S.secretOpen?"🙈":"👁️";
+}
+
+window.onSessionInput=onSessionInput;
+window.pickRole=pickRole;
+window.submitChoice=submitChoice;
+window.confirmEpoch=confirmEpoch;
+window.toggleSecret=toggleSecret;
+</script>
+</body>
+</html>
