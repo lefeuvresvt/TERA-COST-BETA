@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TERRA COST — Groupe (v9.1)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=Archivo+Black&display=swap');
+:root{--ink:#172a22;--mut:#4f6359;--ok:#1f9d63;--ok2:#127a4a;--warn:#cc7a16;--bad:#cf3b2e;--line:#bcd0c4;--purple:#7a63c6}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Archivo',sans-serif;min-width:0;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(160deg,#d3e0d6,#cbd9e0);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px}
+.hidden{display:none!important}
+.screen{width:100%;max-width:620px;margin:auto;background:#fbfdfb;border:2px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:13px;text-align:center;box-shadow:0 12px 36px rgba(30,60,45,.16)}
+.screen h1{font-family:'Archivo Black';font-size:27px;color:#1c3d2c}
+.screen p{color:var(--mut);font-size:15px;font-weight:600}
+.screen input{padding:14px;border-radius:11px;border:2px solid var(--line);background:#fff;color:var(--ink);font-size:21px;text-align:center;width:100%;font-weight:700}
+.screen input:focus{outline:3px solid var(--ok)}
+.err{color:var(--bad);font-size:14px;min-height:16px;font-weight:700}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.btn-role{padding:14px 8px;border-radius:13px;border:2px solid var(--line);background:#fff;color:var(--ink);font-size:14px;font-weight:700;cursor:pointer;min-height:98px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.btn-role:hover:not(:disabled){border-color:var(--ok);background:#eefaf1}
+.btn-role:disabled{opacity:.34;cursor:not-allowed}
+.btn-role .ico{font-size:31px}.btn-role .cnt{font-size:12px;color:var(--mut)}
+.btn-main{width:100%;padding:16px;border-radius:13px;border:none;font-family:'Archivo Black';font-size:17px;cursor:pointer;background:var(--ok);color:#fff;box-shadow:0 4px 0 #127a4a}
+.team-badge{display:inline-flex;align-items:center;gap:8px;border-radius:30px;padding:6px 15px 6px 8px;font-family:'Archivo Black';font-size:16px;border:2.5px solid var(--team,#e0922b);background:color-mix(in srgb,var(--team,#e0922b) 16%,#fff);margin:0 auto}
+.team-badge .em{font-size:23px}
+.lobby-info{background:#fff;border:2px solid var(--line);border-radius:13px;padding:13px;text-align:left}
+.lobby-info h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
+.player-chip{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;padding:5px 0}.player-chip .em{font-size:20px}
+.waiting{font-family:'Archivo Black';font-size:16px;color:var(--mut);padding:12px}
+#plateau{width:min(99vw,1240px);aspect-ratio:1240/800;max-height:97vh;background:#eaf1ec;border:2px solid #9fb8a8;border-radius:20px;box-shadow:0 16px 48px rgba(30,60,45,.2);overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+.top{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:2px solid var(--line);background:linear-gradient(180deg,#dcebe0,#cfe2d5)}
+.brand{font-family:'Archivo Black';font-size:19px;color:#1c3d2c}
+.epoch{font-size:14px;font-weight:700;color:#13456e;background:#d3e8fb;border:2px solid #93c2e6;padding:4px 12px;border-radius:20px}
+.year{font-size:14px;font-weight:700;color:#9a6b1a;background:#fff2db;border:2px solid #e7c186;padding:4px 12px;border-radius:20px}
+.crest{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:27px;background:color-mix(in srgb,var(--team,#e0922b) 18%,#fff);border:2.5px solid var(--team,#e0922b)}
+.who b{font-family:'Archivo Black';font-size:16px}.who span{font-size:13px;color:var(--mut);font-weight:700}
+.sp{flex:1}
+.accord-note{font-size:12px;font-weight:700;color:#5a4d96;background:#efe9fb;border:2px solid #cdbef0;border-radius:20px;padding:6px 11px}
+.corrupt-note{font-size:12px;font-weight:700;color:#7a4a00;background:#ffe3b0;border:2px solid #e0a13a;border-radius:20px;padding:6px 11px}
+.budget{text-align:right}.budget .l{font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:700}.budget .v{font-family:'Archivo Black';font-size:21px;color:#9a6b1a}
+.scoreh{text-align:right;margin-left:6px}.scoreh .l{font-size:11px;color:var(--mut);text-transform:uppercase;font-weight:700}.scoreh .v{font-family:'Archivo Black';font-size:31px;color:var(--ok2);line-height:1}
+.body{display:grid;grid-template-columns:1.05fr 1.4fr 1.55fr;gap:12px;padding:13px;min-height:0}
+.col{display:flex;flex-direction:column;gap:12px;min-height:0;min-width:0}
+.card{background:#fbfdfb;border:2px solid var(--line);border-radius:13px;padding:13px;display:flex;flex-direction:column}
+.card h4{font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#2f4a3e;margin-bottom:10px;font-weight:700}
+.mission{border:2.5px solid #b6a3ea;background:linear-gradient(180deg,#f4efff,#ece4ff);flex:1}
+.mtop{display:flex;gap:12px;align-items:center;margin-bottom:11px}
+.avatar{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:33px;background:#e7defb;border:2.5px solid var(--purple)}
+.mrole{font-family:'Archivo Black';font-size:19px;color:#2a2150}.mrole small{display:block;font-weight:700;font-size:13.5px;color:#6a5ca0;margin-top:2px}
+.goal{background:#fff;border:2px solid #d8cdf5;border-radius:10px;padding:10px 11px;font-size:14px;line-height:1.45;margin-bottom:10px;font-weight:600}
+.solid{font-size:13px;color:#5a4d96;font-weight:700;background:#efe9fb;border:1.5px solid #d8cdf5;border-radius:10px;padding:8px 11px;margin-bottom:11px;line-height:1.4}
+.brick{margin-bottom:9px}
+.brick .bl{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;font-weight:700}.brick .bl b{font-family:'Archivo Black'}
+.brick .bb{height:12px;border-radius:7px;background:#e2dcf2;overflow:hidden;border:1px solid #cfc4ee}.brick .bb>i{display:block;height:100%;border-radius:7px;transition:width .5s}
+.verdict{margin-top:auto;text-align:center;font-family:'Archivo Black';font-size:14px;padding:10px;border-radius:10px;background:#dcf6e7;color:var(--ok2);border:2px solid #a9e3c5}
+.world{display:flex;flex-direction:column;gap:8px}
+.res{background:#fff;border:2px solid var(--line);border-radius:11px;padding:9px 11px}
+.res .rl{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:700;margin-bottom:5px}
+.res .rl .u{font-family:'Archivo Black';font-size:14px}.res .rl .u small{font-weight:700;font-size:12px;color:var(--mut)}
+.res .def{font-family:'Archivo Black';font-size:12.5px;padding:1px 8px;border-radius:8px}
+.res .def.ok{color:var(--ok2);background:#dcf6e7;border:1.5px solid #a9e3c5}.res .def.no{color:#fff;background:var(--bad)}
+.res .bar{height:11px;border-radius:6px;background:#e6ece8;overflow:hidden;border:1px solid #cdddd3;position:relative}
+.res .bar>i{display:block;height:100%;border-radius:6px;transition:width .5s}.res .bar>.dem{position:absolute;top:-3px;bottom:-3px;width:3px;background:#33433b;border-radius:2px}
+.policy{background:linear-gradient(180deg,#e7f0fb,#dcebfb);border:2px solid #9cc4ea;border-radius:11px;padding:9px 11px;font-size:13.5px;font-weight:700;color:#13456e;margin-top:auto}
+.policy.cor{background:#ffe3b0;border-color:#e0a13a;color:#7a4a00}
+.actitle{font-size:13.5px;letter-spacing:.03em;text-transform:uppercase;color:#2f4a3e;font-weight:700}
+.statebtn{padding:11px;border-radius:11px;border:2px solid #c2b2ee;background:#efe9fb;color:#5a4d96;font-family:'Archivo Black';font-size:14px;cursor:pointer}
+.acts{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;overflow:auto}
+.act{background:#fff;border:2.5px solid var(--line);border-radius:12px;padding:9px 12px;display:flex;flex-direction:column;justify-content:center;cursor:pointer;text-align:left;color:var(--ink)}
+.act.sel{border-color:var(--ok);background:#e9faf0;box-shadow:0 0 0 2px #bfe8ce inset}
+.act.trap{border-left:6px solid var(--bad)}.act.free{border-left:6px solid #9aa8a0}
+.act:disabled{opacity:.45;cursor:not-allowed}
+.act .at{display:flex;align-items:center;gap:9px}
+.act .ai{font-size:23px;width:30px;text-align:center}
+.act .an{font-family:'Archivo Black';font-size:15px;flex:1}.act .an small{font-weight:700;color:#7a8a82;font-size:12.5px}
+.price{font-family:'Archivo Black';font-size:15px;text-align:right;white-space:nowrap}
+.price .old{color:#9aa;text-decoration:line-through;font-size:12px;margin-right:4px;font-family:'Archivo'}
+.price .sub{color:var(--ok2)}.price .tax{color:var(--bad)}.price .plain{color:#9a6b1a}.price .gain{color:var(--ok2)}.price .free{color:#5f7268}
+.tg{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:12.5px;padding:1px 8px;border-radius:8px;border:1.5px solid var(--line);color:#3a4a42;font-weight:700;white-space:nowrap}
+.tag.good{color:var(--ok2);border-color:#a9e3c5;background:#e9faf0}.tag.bad{color:var(--bad);border-color:#eebdb6;background:#fdeeec}.tag.coll{color:#9a6b1a;border-color:#ecd4a6;background:#fff6e6}.tag.pol{color:#13456e;border-color:#9cc4ea;background:#e7f0fb}
+.valbtn{padding:13px;border-radius:12px;border:none;font-family:'Archivo Black';font-size:16px;cursor:pointer;flex:none}
+.valbtn.on{background:var(--ok);color:#fff;box-shadow:0 4px 0 #127a4a}.valbtn.off{background:#d6ddd8;color:#8a978f;cursor:not-allowed}
+.overlay{position:fixed;inset:0;background:rgba(20,40,30,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal{background:#fff;border-radius:18px;padding:24px;max-width:480px;width:100%;text-align:center;display:flex;flex-direction:column;gap:13px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal h2{font-family:'Archivo Black';font-size:22px;color:#1c3d2c}.modal p{color:var(--mut);font-size:14px;line-height:1.5;font-weight:600}
+.chips{display:flex;justify-content:center;gap:7px;flex-wrap:wrap}.chip{font-size:16px;font-weight:700;padding:4px 9px;border-radius:20px;background:#fff;border:2px solid var(--line)}.chip.ok{background:#dcf6e7;border-color:#a9e3c5}
+.ev-card{border-radius:20px;padding:26px;max-width:520px;width:100%;text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center;border:2.5px solid;background:#fff}
+.ev-card h2{font-family:'Archivo Black';font-size:23px}.ev-card .evt{font-size:15px;line-height:1.5;color:#3a4a42;font-weight:600}
+.ev-bad{border-color:var(--bad)}.ev-warn{border-color:var(--warn)}.ev-good{border-color:var(--ok)}
+.vote-opt{padding:14px;border-radius:11px;border:2.5px solid var(--line);background:#fff;font-family:'Archivo Black';font-size:16px;cursor:pointer;width:100%}.vote-opt:hover{border-color:var(--ok)}
+.epoch-card{background:#fff;border:2.5px solid var(--ok);border-radius:18px;padding:26px;max-width:540px;width:100%;display:flex;flex-direction:column;gap:12px;text-align:center}
+.epoch-card .era{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ok2);font-weight:700}.epoch-card h2{font-family:'Archivo Black';font-size:25px;color:#1c3d2c}
+.epoch-card .desc{font-size:14.5px;line-height:1.55;color:#3a4a42;font-weight:600}
+.epoch-card .news{background:#f1f6f2;border-radius:11px;padding:13px;font-size:13.5px;text-align:left;line-height:1.7;color:#2f4a3e;font-weight:600}
+.aline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line);font-size:15px;font-weight:700}
+.aline.total{border:none;font-family:'Archivo Black';font-size:24px;padding-top:12px;color:var(--ok2)}
+</style>
+</head>
+<body>
+<div class="screen" id="scr-home">
+  <h1>🌍 TERRA COST</h1>
+  <p>Entrez le code donné par votre professeur, puis choisissez le rôle de votre groupe.</p>
+  <input id="inp-session" type="text" maxlength="8" placeholder="Code de la partie" autocomplete="off" style="text-transform:uppercase" oninput="onSessionInput()">
+  <div class="err" id="err-home"></div>
+  <div class="role-grid" id="role-grid"></div>
+  <p style="font-size:12.5px">Les rôles se répartissent équitablement.</p>
+  <div class="err" id="err-role"></div>
+</div>
+<div class="screen hidden" id="scr-lobby">
+  <div class="team-badge" id="lobby-badge"><span class="em" id="lobby-em">🦊</span><span id="lobby-team">Équipe</span></div>
+  <h1 id="lobby-ico" style="font-size:44px"></h1>
+  <h1 id="lobby-name" style="font-size:21px"></h1>
+  <p id="lobby-goal" style="color:var(--ink);font-weight:600"></p>
+  <div class="lobby-info"><h3>Groupes connectés</h3><div id="player-list"></div></div>
+  <div class="waiting">⏳ Attendez que le professeur lance la partie…</div>
+</div>
+<div class="overlay hidden" id="scr-epoch"><div class="epoch-card">
+  <div class="era" id="ep-era"></div><h2 id="ep-title"></h2><div class="desc" id="ep-desc"></div><div class="news" id="ep-news"></div>
+  <button class="btn-main" onclick="confirmEpoch()">J'ai compris, on continue</button>
+</div></div>
+<div class="overlay hidden" id="scr-event"><div class="ev-card" id="ev-card">
+  <div style="font-size:54px" id="ev-emoji">⚠️</div><h2 id="ev-title"></h2><div class="evt" id="ev-text"></div>
+  <button class="btn-main" onclick="dismissEvent()">Continuer</button>
+</div></div>
+<div class="overlay hidden" id="scr-vote"><div class="modal">
+  <h2 id="vote-title">🗳️ Vote</h2><p id="vote-text"></p>
+  <div id="vote-opts" style="display:flex;flex-direction:column;gap:10px"></div>
+</div></div>
+<div class="overlay hidden" id="scr-wait"><div class="modal">
+  <h2>✅ Choix enregistré</h2><p>On attend les autres groupes…</p><div class="chips" id="wait-chips"></div>
+</div></div>
+<div class="overlay hidden" id="scr-finished"><div class="modal">
+  <h2>🏁 Fin de la partie</h2><p>Le bilan se prépare. Regardez l'écran du professeur.</p>
+</div></div>
+<div class="overlay hidden" id="scr-audit"><div class="modal" style="max-width:500px">
+  <div class="team-badge" id="au-badge"><span class="em" id="au-em"></span><span id="au-team"></span></div>
+  <h2 id="au-role"></h2>
+  <div>
+    <div class="aline"><span>🎯 Mission</span><b id="au-mission"></b></div>
+    <div class="aline"><span>🌱 Durabilité</span><b id="au-durab"></b></div>
+    <div class="aline"><span>🤝 Solidarité</span><b id="au-solid"></b></div>
+    <div class="aline"><span>🌍 × Santé de la planète</span><b id="au-pf"></b></div>
+    <div class="aline total"><span>VOTRE SCORE</span><b id="au-score"></b></div>
+  </div>
+  <p id="au-msg" style="font-size:14px;line-height:1.5;font-weight:600"></p>
+</div></div>
+<div id="plateau" class="hidden">
+  <div class="top">
+    <span class="brand">🌍 TERRA COST</span>
+    <span class="epoch" id="id-epoch">Époque 1</span>
+    <span class="year" id="id-year">Année 1 / 3</span>
+    <span class="crest" id="id-crest">🦊</span>
+    <div class="who"><b id="id-team">Équipe</b><br><span id="id-role">Rôle</span></div>
+    <span class="sp"></span>
+    <span class="accord-note hidden" id="accord-note">🤝 Accord climatique</span>
+    <span class="corrupt-note hidden" id="corrupt-note">🕴️ Caisse noire</span>
+    <div class="budget"><div class="l">Budget</div><div class="v" id="id-cash">0 €</div></div>
+    <div class="scoreh"><div class="l">Score</div><div class="v" id="id-score">—<span style="font-size:14px;color:#9aa">/100</span></div></div>
+  </div>
+  <div class="body">
+    <div class="col"><div class="card mission">
+      <h4>🎯 Votre mission</h4>
+      <div class="mtop"><div class="avatar" id="m-av">⚡</div><div class="mrole" id="m-role">Rôle<small id="m-sub"></small></div></div>
+      <div class="goal" id="goal"></div>
+      <div class="solid" id="m-solid"></div>
+      <div class="brick"><div class="bl"><span>🎯 Mission</span><b id="bk-mi">—/60</b></div><div class="bb"><i id="bb-mi" style="width:0;background:var(--ok)"></i></div></div>
+      <div class="brick"><div class="bl"><span>🌱 Durabilité</span><b id="bk-du">—/25</b></div><div class="bb"><i id="bb-du" style="width:0;background:var(--ok)"></i></div></div>
+      <div class="brick"><div class="bl"><span>🤝 Solidarité</span><b id="bk-so">—/15</b></div><div class="bb"><i id="bb-so" style="width:0;background:var(--ok)"></i></div></div>
+      <div class="verdict" id="verdict">En attente…</div>
+    </div></div>
+    <div class="col">
+      <div class="card" style="flex:1"><h4>L'état du monde — en unités</h4><div class="world" id="world"></div>
+        <div class="policy" id="policy">🏛️ L'État n'a voté aucune politique de prix.</div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="actitle" id="acts-title">Votre décision pour cette année</div>
+      <button class="statebtn hidden" id="btn-propose" onclick="proposeAccord()">🗳️ Proposer l'accord climatique à la classe</button>
+      <div class="acts" id="actions"></div>
+      <button class="valbtn off" id="btn-val" onclick="submitChoice()" disabled>Choisissez une action</button>
+    </div>
+  </div>
+</div>
+<script type="module">
+/* TERRA COST groupe v9.1 */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+const CFG={apiKey:"AIzaSyCKKcYvlsBxJhKsS02CkEhRHMcvvOWvsdk",authDomain:"tera-cost-svt.firebaseapp.com",databaseURL:"https://tera-cost-svt-default-rtdb.europe-west1.firebasedatabase.app",projectId:"tera-cost-svt",storageBucket:"tera-cost-svt.firebasestorage.app",messagingSenderId:"842230494161",appId:"1:842230494161:web:ced9dae0bc2faca7bbe6f0"};
+const MAX_GROUPS=30;
+const EMBLEMS=["🦊","🦉","🐢","🦅","🐝","🦌","🐗","🦫","🦡","🦔","🐺","🦦","🦚","🐅","🦏","🐘","🦓","🐊","🦩","🦬","🦒","🐆","🦃","🐉"];
+const COLORS=["#E0922B","#4A9ECD","#5FC98E","#9B8FD4","#E06A5A","#E8B84B","#46C2C2","#D17BB0","#7FB23A","#C77F4A"];
+const WORDS=["Renards","Hiboux","Tortues","Aigles","Abeilles","Cerfs","Sangliers","Castors","Blaireaux","Hérissons","Loups","Loutres","Paons","Tigres","Rhinos","Éléphants","Zèbres","Crocos","Flamants","Bisons","Girafes","Guépards","Dindons","Dragons"];
+const ROLES=[
+ {ico:"⚡",name:"Le Producteur d'énergie",col:"#E0922B",goal:"Fournir l'énergie dont tous ont besoin en basculant vers le renouvelable. Le propre coûte cher : épargnez, profitez des subventions de l'État.",solid:"🤝 Solidarité = fournir de l'énergie à TOUTE la population et aux autres groupes."},
+ {ico:"🌾",name:"L'Agriculteur",col:"#7FB23A",goal:"Nourrir la population avec des méthodes durables. Vos cultures dépendent de l'énergie et de l'eau.",solid:"🤝 Solidarité = nourrir TOUTE la population, pas seulement vous."},
+ {ico:"🏗️",name:"Le Bâtisseur",col:"#9B8FD4",goal:"Fournir les matériaux à la société, en recyclant. Vos matériaux servent aussi à construire le renouvelable.",solid:"🤝 Solidarité = donner des matériaux à ceux qui en ont besoin (renouvelable)."},
+ {ico:"🌿",name:"L'Écologiste",col:"#46c281",goal:"Protéger la santé de la planète et l'eau. La santé que vous maintenez augmente le rendement de TOUS.",solid:"🤝 Solidarité = préserver le bien commun (planète, eau) pour tout le monde."},
+ {ico:"🏛️",name:"L'État",col:"#4A9ECD",goal:"Vous ne produisez pas : vous RÉGULEZ. Taxez le sale (ça remplit votre caisse), subventionnez le propre, aidez les groupes pauvres. Sans vous, la transition est impossible.",solid:"🤝 Solidarité = coopérer et redistribuer. (Attention : la Caisse noire ruine votre Solidarité.)"},
+];
+const EPOCHS=[
+ {era:"Époque 1 · vers 1750",title:"Le monde préindustriel",desc:"La hache et la charrue. La population a déjà faim, soif et froid : il faut produire dès maintenant.",news:"✦ Chaque rôle a son métier\n✦ La demande grimpe chaque année\n✦ Budget serré : le propre coûte cher\n✦ L'État peut déjà TAXER pour se constituer une caisse"},
+ {era:"Époque 2 · 1800-1900",title:"La révolution industrielle",desc:"Les machines réclament de l'énergie. Les profits explosent, le ciel noircit.",news:"✦ Le charbon : bon marché mais sale\n✦ L'État commence à subventionner le propre"},
+ {era:"Époque 3 · 1900-2030",title:"Le monde moderne",desc:"Le pétrole fait tourner la planète. Les renouvelables apparaissent… mais coûtent cher.",news:"✦ ☀️ solaire, 🌬️ éolien, ⚛️ nucléaire (chers !)\n✦ L'État : taxe / subventionne / propose un 🗳️ accord"},
+ {era:"Époque 4 · 2030-2100",title:"Le monde futur",desc:"Les fossiles s'épuisent. Le monde que vous jouez, c'est celui que vous habiterez.",news:"✦ Renouvelable mûr, recyclage, accords\n✦ L'État redistribue sa caisse"},
+];
+function K(ic,nm,rl,o){return Object.assign({ic,nm,rl,cost:0,ep:0,eu:0,mp:0,mu:0,fp:0,w:0,fo:0,s:0,emp:0,ren:false,dur:false,trap:false,coop:false,pol:null,free:false},o);}
+const FREE={0:K("🪵","Système D","bois mort",{cost:0,ep:1,free:1}),1:K("🧺","Système D","cueillette",{cost:0,fp:1,free:1}),2:K("🧱","Système D","récup",{cost:0,mp:1,free:1}),3:K("📢","Système D","sensibiliser",{cost:0,s:1,free:1}),4:K("🗣️","Système D","discours",{cost:0,coop:1,free:1})};
+const ACTIONS=[
+ [[K("🪵","Brûler du bois","combustion",{cost:1,ep:2,s:-1,emp:1}),K("💨","Moulin à vent","éolien mécanique",{cost:2,ep:1,ren:1,dur:1}),K("💧","Moulin à eau","hydraulique",{cost:3,ep:2,w:-1,ren:1,dur:1}),FREE[0]],
+  [K("⚫","Centrale à charbon","thermique",{cost:1,ep:6,fo:-4,s:-3,emp:4,trap:1}),K("🚂","Machine à vapeur","charbon",{cost:1,ep:4,fo:-3,s:-2,emp:3,trap:1}),K("💧","Turbine hydraulique","hydroélectricité",{cost:6,ep:4,w:-1,ren:1,dur:1}),FREE[0]],
+  [K("🛢️","Forer le pétrole","forage pétrolier",{cost:2,ep:9,fo:-6,w:-2,s:-4,emp:6,trap:1}),K("💥","Fracturer le sol","gaz de schiste",{cost:2,ep:8,fo:-5,w:-3,s:-4,emp:5,trap:1}),K("☀️","Capter le soleil","ferme photovoltaïque",{cost:8,ep:5,mu:3,s:1,ren:1,dur:1}),K("🌬️","Capter le vent","parc éolien",{cost:7,ep:5,mu:3,ren:1,dur:1}),K("⚛️","Maîtriser l'atome","centrale nucléaire",{cost:12,ep:8,mu:5,w:-1}),FREE[0]],
+  [K("🔥","Brûler les dernières réserves","fossile",{cost:2,ep:10,fo:-8,w:-3,s:-5,emp:8,trap:1}),K("🌊","Éolien en mer","offshore",{cost:9,ep:7,mu:4,s:1,ren:1,dur:1}),K("☀️","Ferme solaire géante","photovoltaïque",{cost:9,ep:7,mu:4,s:1,ren:1,dur:1}),K("⚙️","Améliorer le rendement","efficacité énergétique",{cost:6,ep:5,ren:1,dur:1}),FREE[0]]],
+ [[K("🌾","Cultiver des champs","agriculture vivrière",{cost:1,fp:3,w:-1,s:-1,emp:1}),K("🐄","Élever du bétail","élevage",{cost:2,fp:2,w:-1,s:-1,emp:1}),K("🔁","Rotation des cultures","jachère",{cost:3,fp:2,dur:1}),FREE[1]],
+  [K("🚜","Mécaniser les fermes","machines agricoles",{cost:2,fp:4,eu:1,w:-1,s:-1,emp:2}),K("💩","Fertiliser au fumier","engrais naturels",{cost:5,fp:4,dur:1}),K("🌴","Défricher la forêt","déforestation",{cost:1,fp:4,s:-3,emp:2,trap:1}),FREE[1]],
+  [K("🧪","Cultiver à fond","agriculture intensive",{cost:2,fp:6,eu:2,w:-3,s:-2,emp:2,trap:1}),K("🌴","Huile de palme","déforestation",{cost:2,fp:6,s:-3,emp:2,trap:1}),K("💧","Irriguer les cultures","irrigation",{cost:5,fp:5,w:-2,eu:1,s:-1,emp:1}),K("🌽","Semences sélectionnées","OGM",{cost:5,fp:5,s:-1,emp:1}),FREE[1]],
+  [K("🌱","Cultiver avec la nature","permaculture",{cost:6,fp:4,s:1,dur:1}),K("💧","Goutte-à-goutte","précision",{cost:6,fp:5,w:-1,dur:1}),K("🌿","Agriculture biologique","bio",{cost:6,fp:4,s:1,dur:1}),K("🏙️","Fermes verticales","agriculture urbaine",{cost:7,fp:5,eu:2}),FREE[1]]],
+ [[K("🪨","Tailler la pierre","carrière",{cost:1,mp:3,eu:1,s:-1,emp:1}),K("🪵","Bois de construction","filière bois",{cost:3,mp:3,eu:1,s:-1,dur:1}),K("🧱","Fabriquer des briques","terre cuite",{cost:1,mp:3,eu:1,s:-1,emp:1}),FREE[2]],
+  [K("⛏️","Extraire le fer","mine de fer",{cost:2,mp:5,eu:2,s:-2,emp:3}),K("🏭","Forger l'acier","hauts fourneaux",{cost:2,mp:6,eu:3,s:-2,emp:4,trap:1}),K("🪨","Exploiter une carrière","granulats",{cost:4,mp:4,eu:1,s:-1,emp:1,dur:1}),FREE[2]],
+  [K("🏗️","Couler du béton","béton armé",{cost:3,mp:6,eu:3,s:-2,emp:4}),K("⛏️","Mine à ciel ouvert","minerais",{cost:2,mp:7,eu:3,s:-3,emp:5,trap:1}),K("💎","Exploiter les terres rares","métaux rares",{cost:2,mp:7,eu:3,s:-3,emp:5,trap:1}),K("🛢️","Fabriquer du plastique","pétrochimie",{cost:2,mp:5,eu:2,s:-2,emp:3,trap:1}),FREE[2]],
+  [K("♻️","Recycler les métaux","économie circulaire",{cost:6,mp:5,eu:3,dur:1}),K("🌾","Éco-matériaux","bois, terre crue",{cost:6,mp:5,eu:1,s:1,dur:1}),K("🏚️","Réemployer","déconstruction",{cost:5,mp:4,eu:1,dur:1}),FREE[2]]],
+ [[K("🌳","Protéger une forêt","mise en réserve",{cost:2,s:2,w:1,dur:1}),K("🏞️","Préserver une zone humide","marais",{cost:2,s:2,w:2,dur:1}),K("🦌","Protéger la faune","chasse réglementée",{cost:1,s:1,dur:1}),FREE[3]],
+  [K("🏞️","Créer un parc naturel","espace protégé",{cost:4,s:3,w:1,dur:1}),K("🌳","Reboiser","reforestation",{cost:4,s:3,dur:1}),K("🚰","Protéger les sources","gestion de l'eau",{cost:3,s:1,w:2,dur:1}),FREE[3]],
+  [K("🦌","Réserve naturelle","Natura 2000",{cost:5,s:3,w:1,dur:1}),K("🚱","Nettoyer l'eau","station d'épuration",{cost:5,w:3,s:1,dur:1}),K("🌳","Lutter contre la déforestation","protection",{cost:4,s:2,dur:1}),K("🏝️","Écotourisme de masse","exploiter la nature",{cost:-3,s:-2,w:-2,emp:1,trap:1}),FREE[3]],
+  [K("🌳","Reforestation massive","reboisement",{cost:6,s:4,dur:1}),K("🌐","Corridors écologiques","trame verte",{cost:5,s:3,dur:1}),K("🪸","Restaurer les écosystèmes","renaturation",{cost:6,s:4,w:1,dur:1}),K("🏝️","Écotourisme de masse","exploiter la nature",{cost:-3,s:-2,w:-2,emp:1,trap:1}),FREE[3]]],
+ [[K("💸","Lever l'impôt","taxe les pollueurs",{cost:1,coop:1,pol:{taxe:2}}),K("📜","Réguler les communs","règles",{cost:1,s:1,coop:1}),K("🌾","Répartir les terres","redistribuer",{cost:1,coop:1,pol:{grant:4}}),FREE[4]],
+  [K("💸","Taxe sur les usines","taxe carbone",{cost:1,dur:1,coop:1,pol:{taxe:4}}),K("🏦","Premières subventions","aides au propre",{cost:1,coop:1,dur:1,pol:{subv:3}}),K("🤝","Aider un groupe","redistribuer",{cost:1,coop:1,pol:{grant:6}}),K("📰","Laisser-faire","dérégulation",{cost:0,trap:1,pol:{laxe:3}}),FREE[4]],
+  [K("💸","Taxe carbone","faire payer les pollueurs",{cost:1,dur:1,coop:1,pol:{taxe:5}}),K("📊","Imposer des normes","normes enviro.",{cost:2,s:1,dur:1,coop:1,pol:{taxe:3}}),K("🏦","Subventionner le propre","aides renouvelables",{cost:1,coop:1,dur:1,pol:{subv:5}}),K("🤝","Aider un groupe","redistribuer",{cost:1,coop:1,pol:{grant:8}}),K("💰","Subventionner le fossile","aides aux fossiles",{cost:0,trap:1,pol:{laxe:4}}),K("📰","Laisser-faire","dérégulation",{cost:0,trap:1,pol:{laxe:3}})],
+  [K("🤝","Accord de Paris","accord international",{cost:1,coop:1,dur:1,pol:{taxe:4,accord:1}}),K("🏦","Subventionner le propre","aides renouvelables",{cost:1,coop:1,dur:1,pol:{subv:6}}),K("🎁","Plan de redistribution","grande aide",{cost:1,coop:1,pol:{grant:12}}),K("📉","Marché du carbone","quotas",{cost:2,dur:1,coop:1,pol:{taxe:5}}),K("🕴️","Caisse noire","détourner les fonds",{cost:0,trap:1,pol:{grab:3}}),K("📰","Laisser-faire","dérégulation",{cost:0,trap:1,pol:{laxe:3}})]],
+];
+function polLabel(p){if(!p)return null;if('taxe'in p)return["taxe le sale +"+p.taxe+" €","pol"];if('subv'in p)return["subventionne le propre −"+p.subv+" €","pol"];if('grant'in p)return["donne "+p.grant+" € au + pauvre","pol"];if('laxe'in p)return["dérégule (sale −"+p.laxe+" €)","bad"];if('grab'in p)return["🕴️ détourne l'argent","bad"];return null;}
+function tags(a){const t=[];
+  if(a.ep)t.push(["⚡ +"+a.ep,"good"]);if(a.fp)t.push(["🍞 +"+a.fp,"good"]);if(a.mp)t.push(["🏗️ +"+a.mp,"good"]);
+  if(a.eu)t.push(["⚡ −"+a.eu,"coll"]);if(a.mu)t.push(["🏗️ −"+a.mu,"coll"]);
+  if(a.s>0)t.push(["🌍 +"+a.s,"good"]);if(a.s<0)t.push(["🌍 "+a.s,"bad"]);
+  if(a.w>0)t.push(["💧 +"+a.w,"good"]);if(a.w<0)t.push(["💧 "+a.w,"bad"]);
+  if(a.emp>0)t.push(["☁️ +"+a.emp,"bad"]);if(a.fo)t.push(["⛽ "+a.fo,"bad"]);
+  if(a.coop)t.push(["🤝 coopère","coll"]);
+  if(a.free)t.push(["gratuit mais faible","coll"]);
+  const pl=polLabel(a.pol);if(pl)t.push(pl);
+  return t;}
+let UID=Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+let DB=null,SESSION=null,MY_ROLE=null,MY_TEAM=null;
+let S={epochIdx:0,tourInEpoch:1,tpe:3,selected:null,locked:false};
+let _inLobby=true,_lastChoice=null,_restored=false,_seenEvent="",_votedKey="",_prices={dirtyMod:0,subv:0,corrupt:false,grab:0};
+const $=id=>document.getElementById(id);const _c={};
+function setIf(id,p,v){const k=id+":"+p;if(_c[k]===v)return;_c[k]=v;const el=$(id);if(!el)return;if(p==="text")el.textContent=v;else if(p==="width")el.style.width=v;else if(p==="html")el.innerHTML=v;}
+function applyTeam(){if(MY_TEAM)document.documentElement.style.setProperty("--team",MY_TEAM.col);}
+function teamLabel(){return MY_TEAM?`Les ${MY_TEAM.word} #${MY_TEAM.num}`:"Équipe";}
+function saveS(){try{sessionStorage.setItem("tc91",JSON.stringify({s:SESSION,uid:UID,ri:MY_ROLE,team:MY_TEAM}));}catch(e){}}
+function tryResume(){let d=null;try{d=JSON.parse(sessionStorage.getItem("tc91")||"null");}catch(e){}
+  if(!d||!d.s||d.ri==null)return;SESSION=d.s;UID=d.uid;MY_ROLE=d.ri;MY_TEAM=d.team;
+  if(!DB)DB=getDatabase(initializeApp(CFG,"tc"));applyTeam();
+  get(ref(DB,`s/${SESSION}/lobby/${UID}`)).then(snap=>{if(!snap.val()){sessionStorage.removeItem("tc91");return;}_restored=true;showLobby();listenLobby();listenGame();});}
+function buildRoleGrid(){const g=$("role-grid");g.innerHTML="";ROLES.forEach((r,i)=>{const b=document.createElement("button");b.className="btn-role";b.id="rb"+i;b.disabled=true;b.onclick=()=>pickRole(i);b.innerHTML=`<span class="ico">${r.ico}</span>${r.name}<span class="cnt" id="rc${i}">—</span>`;g.appendChild(b);});}
+function onSessionInput(){const s=$("inp-session").value.trim().toUpperCase();if(s.length<3||s===SESSION)return;SESSION=s;if(!DB)DB=getDatabase(initializeApp(CFG,"tc"));onValue(ref(DB,`s/${SESSION}/lobby`),snap=>{if(_inLobby&&MY_ROLE===null)updRoles(snap.val()||{});});}
+function counts(lobby){const c=[0,0,0,0,0];Object.values(lobby).forEach(p=>{if(p&&p.ri!=null)c[p.ri]++;});return c;}
+function updRoles(lobby){const c=counts(lobby),tot=Object.values(lobby).filter(Boolean).length,mn=Math.min(...c);for(let i=0;i<5;i++){const bal=c[i]>mn,full=tot>=MAX_GROUPS;$("rb"+i).disabled=bal||full;$("rc"+i).textContent=c[i]+(c[i]>1?" groupes":" groupe")+(bal&&!full?" · complet":"");}}
+function pickRole(ri){const s=$("inp-session").value.trim().toUpperCase();if(s.length<3){$("err-home").textContent="Entrez d'abord le code.";return;}SESSION=s;if(!DB)DB=getDatabase(initializeApp(CFG,"tc"));
+  get(ref(DB,`s/${SESSION}/lobby`)).then(snap=>{const lobby=snap.val()||{},c=counts(lobby),tot=Object.values(lobby).filter(Boolean).length,mn=Math.min(...c);
+    if(c[ri]>mn){$("err-role").textContent="Ce rôle est complet, choisissez-en un autre.";return;}
+    if(tot>=MAX_GROUPS){$("err-role").textContent="Partie pleine.";return;}
+    MY_ROLE=ri;const gi=tot,num=c[ri]+1;MY_TEAM={em:EMBLEMS[gi%EMBLEMS.length],col:COLORS[gi%COLORS.length],num,word:WORDS[gi%WORDS.length]};applyTeam();
+    set(ref(DB,`s/${SESSION}/lobby/${UID}`),{ri,name:ROLES[ri].name,ico:ROLES[ri].ico,em:MY_TEAM.em,col:MY_TEAM.col,num,word:MY_TEAM.word})
+      .then(()=>{saveS();showLobby();listenLobby();listenGame();}).catch(e=>{$("err-role").textContent="Erreur : "+e.message;});});}
+function showLobby(){const r=ROLES[MY_ROLE];if(MY_TEAM){$("lobby-em").textContent=MY_TEAM.em;$("lobby-team").textContent=teamLabel();$("lobby-badge").style.setProperty("--team",MY_TEAM.col);}
+  $("lobby-ico").textContent=r.ico;$("lobby-name").textContent=r.name;$("lobby-goal").textContent=r.goal;
+  $("scr-home").classList.add("hidden");$("scr-lobby").classList.remove("hidden");}
+function listenLobby(){onValue(ref(DB,`s/${SESSION}/lobby`),snap=>{const lobby=snap.val()||{},list=$("player-list");if(!list)return;list.innerHTML="";Object.values(lobby).forEach(p=>{if(!p)return;const d=document.createElement("div");d.className="player-chip";d.innerHTML=`<span class="em">${p.em||"•"}</span><span>${p.ico} ${p.word?("Les "+p.word+" #"+p.num):p.name}</span>`;list.appendChild(d);});});}
+function listenGame(){onValue(ref(DB,`s/${SESSION}/game`),snap=>{const g=snap.val();if(!g)return;
+  if(_restored){_restored=false;if(g.phase!=="lobby"){_inLobby=false;buildBoard();$("scr-lobby").classList.add("hidden");if(g.choices?.[UID]!=null){_lastChoice=g.choices[UID];S.locked=true;}$("plateau").classList.remove("hidden");}}
+  if(_inLobby&&g.phase==="playing"){_inLobby=false;$("scr-lobby").classList.add("hidden");buildBoard();showEpoch(0,()=>{$("plateau").classList.remove("hidden");handle(g);});return;}
+  if(_inLobby)return;handleVote(g);
+  if(g.phase==="playing")handle(g);
+  else if(g.phase==="finished"){$("scr-wait").classList.add("hidden");$("scr-finished").classList.remove("hidden");}
+  else if(g.phase==="audit"){$("scr-finished").classList.add("hidden");showAudit(g);}});}
+function handle(g){if(g.prices)_prices=g.prices;if(g.tpe)S.tpe=g.tpe;
+  const empty=!g.choices||Object.keys(g.choices).length===0;
+  if(g.epochIdx!==undefined&&g.epochIdx!==S.epochIdx){const ne=g.epochIdx;showEpoch(ne,()=>{S.epochIdx=ne;S.tourInEpoch=g.tourInEpoch||1;S.locked=false;S.selected=null;_lastChoice=null;$("scr-wait").classList.add("hidden");render(g);});return;}
+  S.epochIdx=g.epochIdx??0;S.tourInEpoch=g.tourInEpoch??1;
+  if(_lastChoice!==null&&empty){_lastChoice=null;S.locked=false;S.selected=null;$("scr-wait").classList.add("hidden");}
+  const my=g.choices?.[UID];if(my!==undefined&&my!==null){_lastChoice=my;S.locked=true;}
+  maybeEvent(g);render(g);if(_lastChoice!==null&&!empty)showWait(g);}
+function buildBoard(){if(MY_TEAM){$("id-crest").textContent=MY_TEAM.em;$("id-team").textContent=teamLabel();$("id-crest").style.setProperty("--team",MY_TEAM.col);}
+  const r=ROLES[MY_ROLE];$("id-role").textContent=r.name;$("m-av").textContent=r.ico;$("m-role").childNodes[0].nodeValue=r.name;$("goal").textContent=r.goal;$("m-solid").textContent=r.solid;
+  $("btn-propose").classList.toggle("hidden",MY_ROLE!==4);}
+function price(a){let c=a.cost;if(_prices.corrupt)c+=_prices.grab||0;else{if(a.trap)c+=_prices.dirtyMod||0;if((a.ren||a.dur)&&(_prices.subv||0)>0)c-=_prices.subv;}return c;}
+function render(g){
+  const ep=EPOCHS[S.epochIdx];setIf("id-epoch","text",ep.era.split(" · ")[0]+" · "+ep.title);setIf("id-year","text","Année "+S.tourInEpoch+" / "+S.tpe);
+  const sh=g.shared||{};const cash=g.cash?.[UID]??0;setIf("id-cash","text",Math.round(cash)+" €");
+  $("accord-note").classList.toggle("hidden",!g.accord);$("corrupt-note").classList.toggle("hidden",!_prices.corrupt);
+  const sc=g.scores?.[UID];
+  if(sc){setIf("id-score","html",Math.round(sc.total)+'<span style="font-size:14px;color:#9aa">/100</span>');
+    setIf("bk-mi","text",Math.round(sc.mission)+"/60");setIf("bb-mi","width",(sc.mission/60*100)+"%");
+    setIf("bk-du","text",Math.round(sc.durab)+"/25");setIf("bb-du","width",(sc.durab/25*100)+"%");
+    setIf("bk-so","text",Math.round(sc.solid)+"/15");setIf("bb-so","width",(sc.solid/15*100)+"%");
+    const v=sc.total>=68?["#dcf6e7","#127a4a","✅ Bon cap, continuez !"]:sc.total>=42?["#fff2db","#9a6b1a","⚠️ Peut mieux faire."]:["#fdeeec","#cf3b2e","❌ Score en chute."];
+    const vd=$("verdict");vd.style.background=v[0];vd.style.color=v[1];vd.textContent=v[2]+" (× planète "+Math.round(sh.sante??100)+" %)";}
+  const col=r=>r>=.85?"#1f9d63":r>=.6?"#cc7a16":"#cf3b2e";const u=sh;
+  const rowF=(lab,prod,dem)=>{const r=dem>0?Math.min(1,prod/dem):1;const d=Math.round(prod-dem);const def=d>=0?'<span class="def ok">OK</span>':`<span class="def no">${d}</span>`;
+    return `<div class="res"><div class="rl"><span>${lab}</span><span class="u">${Math.round(prod)} <small>/ ${Math.round(dem)}</small></span>${def}</div><div class="bar"><i style="width:${Math.round(r*100)}%;background:${col(r)}"></i><span class="dem" style="left:${Math.min(98,Math.round((dem/Math.max(dem,prod,1))*100))}%"></span></div></div>`;};
+  const stock=(lab,v,unit)=>`<div class="res"><div class="rl"><span>${lab}</span><span class="u">${Math.round(v)} <small>${unit}</small></span>${v>=40?'<span class="def ok">OK</span>':'<span class="def no">bas</span>'}</div><div class="bar"><i style="width:${Math.round(v)}%;background:${v>=40?'#1f9d63':v>=25?'#cc7a16':'#cf3b2e'}"></i></div></div>`;
+  const W=rowF("⚡ Énergie",u.eProd??0,u.eDem??0)+rowF("🍞 Nourriture",u.fProd??0,u.fDem??0)+rowF("🏗️ Matériaux",u.mProd??0,u.mDem??0)+stock("💧 Eau",u.eau??100,"réserve")+stock("🌍 Santé planète",u.sante??100,"")+stock("⛽ Fossiles",u.fossiles??100,"restants");
+  if(_c.world!==W){_c.world=W;$("world").innerHTML=W;}
+  const pol=$("policy");
+  if(_prices.corrupt){pol.className="policy cor";pol.innerHTML="🕴️💰 <b>Caisse noire :</b> l'État sur-taxe tout le monde. Tout coûte plus cher !";}
+  else{pol.className="policy";let parts=[];if((_prices.dirtyMod||0)>0)parts.push("Taxe carbone +"+_prices.dirtyMod+" €");if((_prices.dirtyMod||0)<0)parts.push("Dérégulation");if((_prices.subv||0)>0)parts.push("Subvention propre −"+_prices.subv+" €");
+    pol.innerHTML="🏛️ <b>Politique de l'État :</b> "+(parts.length?parts.join(" + "):"aucune politique de prix pour l'instant.");}
+  $("btn-propose").classList.toggle("hidden",MY_ROLE!==4||S.epochIdx<1);
+  renderActions(g);
+}
+function renderActions(g){
+  const acts=ACTIONS[MY_ROLE][S.epochIdx];const cash=g.cash?.[UID]??0;
+  const key=S.epochIdx+":"+S.selected+":"+S.locked+":"+Math.round(cash)+":"+JSON.stringify(_prices);
+  if(_c.acts===key)return;_c.acts=key;
+  setIf("acts-title","text","Votre décision — "+EPOCHS[S.epochIdx].title);
+  const box=$("actions");box.innerHTML="";
+  acts.forEach((a,i)=>{
+    const p=price(a);const afford=cash>=p;
+    const btn=document.createElement("button");
+    btn.className="act"+(S.selected===i&&!S.locked?" sel":"")+(a.trap?" trap":"")+(a.free?" free":"");
+    btn.disabled=S.locked||!afford;
+    const tg=tags(a).map(t=>`<span class="tag ${t[1]}">${t[0]}</span>`).join("");
+    let pr;
+    if(a.free)pr=`<span class="price"><span class="free">gratuit</span></span>`;
+    else if(p<0)pr=`<span class="price"><span class="gain">+${-p} €</span></span>`;
+    else if(p!==a.cost){const cls=p<a.cost?"sub":"tax";pr=`<span class="price"><span class="old">${a.cost} €</span><span class="${cls}">${p} €</span></span>`;}
+    else pr=`<span class="price"><span class="plain">${p} €</span></span>`;
+    btn.innerHTML=`<div class="at"><span class="ai">${a.ic}</span><span class="an">${a.nm} <small>(${a.rl})</small></span>${pr}</div>
+      <div class="tg">${afford?tg:'<span class="tag bad">💰 trop cher pour votre budget</span>'}</div>`;
+    btn.onclick=()=>{if(!S.locked&&afford){S.selected=(S.selected===i)?null:i;_c.acts=null;renderActions(g);}};
+    box.appendChild(btn);
+  });
+  const ok=S.selected!==null&&!S.locked;$("btn-val").disabled=!ok;$("btn-val").className="valbtn "+(ok?"on":"off");$("btn-val").textContent=ok?"✅ Valider mon choix":(S.locked?"⏳ Choix enregistré":"Choisissez une action");
+}
+function submitChoice(){if(S.selected===null||S.locked)return;S.locked=true;_c.acts=null;update(ref(DB,`s/${SESSION}/game/choices`),{[UID]:S.selected}).catch(e=>console.error(e));}
+function proposeAccord(){update(ref(DB,`s/${SESSION}/game/voteRequest`),{by:UID,key:"r"+Date.now()});}
+window.proposeAccord=proposeAccord;
+function showWait(g){$("scr-wait").classList.remove("hidden");const lobby=g.lobbySnapshot||{};setIf("wait-chips","html",Object.entries(lobby).map(([uid,p])=>{if(!p)return"";const d=g.choices?.[uid]!=null;return `<span class="chip${d?' ok':''}">${d?"✅":"⏳"}${p.em||p.ico}</span>`;}).join(""));}
+function maybeEvent(g){const ev=g.event,key=ev?(ev.title||""):"";if(!ev||!key||key===_seenEvent){if(!ev)_seenEvent="";return;}_seenEvent=key;
+  $("ev-card").className="ev-card "+(ev.ty==="good"?"ev-good":ev.ty==="bad"?"ev-bad":"ev-warn");
+  $("ev-emoji").textContent=ev.ic||"⚠️";$("ev-title").textContent="Événement — "+(ev.title||"");$("ev-text").textContent=ev.text||"";$("scr-event").classList.remove("hidden");}
+function dismissEvent(){$("scr-event").classList.add("hidden");}
+function handleVote(g){const v=g.vote;if(!v||!v.open){$("scr-vote").classList.add("hidden");return;}if(v.key===_votedKey)return;
+  $("vote-title").textContent=v.title||"🗳️ Vote";$("vote-text").textContent=v.text||"";const box=$("vote-opts");box.innerHTML="";
+  (v.options||["Oui","Non"]).forEach((opt,i)=>{const b=document.createElement("button");b.className="vote-opt";b.textContent=opt;b.onclick=()=>{_votedKey=v.key;update(ref(DB,`s/${SESSION}/game/voteResponses`),{[UID]:i});$("scr-vote").classList.add("hidden");};box.appendChild(b);});
+  $("scr-vote").classList.remove("hidden");}
+function showEpoch(idx,cb){const ep=EPOCHS[idx];$("ep-era").textContent=ep.era;$("ep-title").textContent=ep.title;$("ep-desc").textContent=ep.desc;$("ep-news").innerHTML=ep.news.replaceAll("\n","<br>");$("scr-epoch").classList.remove("hidden");window._cb=cb;}
+function confirmEpoch(){$("scr-epoch").classList.add("hidden");if(window._cb){window._cb();window._cb=null;}}
+function showAudit(g){$("plateau").classList.add("hidden");$("scr-wait").classList.add("hidden");
+  const sc=g.scores?.[UID]||{total:0,mission:0,durab:0,solid:0};const sh=g.shared||{};
+  if(MY_TEAM){$("au-em").textContent=MY_TEAM.em;$("au-team").textContent=teamLabel();$("au-badge").style.setProperty("--team",MY_TEAM.col);}
+  $("au-role").textContent=ROLES[MY_ROLE].ico+" "+ROLES[MY_ROLE].name;
+  $("au-mission").textContent=Math.round(sc.mission)+" / 60";$("au-durab").textContent=Math.round(sc.durab)+" / 25";$("au-solid").textContent=Math.round(sc.solid)+" / 15";
+  $("au-pf").textContent=Math.round(sh.sante??0)+" %";$("au-score").textContent=Math.round(sc.total)+" / 100";
+  $("au-msg").innerHTML=(sh.sante??0)<25?"🌍 La planète s'est effondrée — tous les scores chutent. La leçon : impossible de réussir en la détruisant.":(sc.magot>0?"🕴️ Votre magot a payé… cette fois. La corruption a enrichi l'État au prix du bien commun.":"Comparez votre score avec les autres équipes sur l'écran du professeur !");
+  $("scr-audit").classList.remove("hidden");}
+window.onSessionInput=onSessionInput;window.pickRole=pickRole;window.submitChoice=submitChoice;window.confirmEpoch=confirmEpoch;window.dismissEvent=dismissEvent;
+buildRoleGrid();tryResume();
+</script>
+</body>
+</html>
